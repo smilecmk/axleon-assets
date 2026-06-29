@@ -1,0 +1,2522 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inference Menu — UI Mockup</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: rgba(37, 99, 235, 0.18);
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
+    background: #f5f6f8;
+    color: #1f2937;
+    font-size: 13px;
+    touch-action: manipulation;  /* 300ms 탭 지연 제거 */
+  }
+  /* 모든 인터랙티브 요소: 터치 최적화 */
+  a, button, .tab, .card, .fw-card, [onclick], input[type="radio"], input[type="checkbox"], select {
+    touch-action: manipulation;
+    cursor: pointer;
+  }
+  /* 사이드바 링크는 href 없이도 터치 인식되도록 */
+  .sidebar a {
+    -webkit-user-select: none;
+    user-select: none;
+    min-height: 36px;  /* 충분한 터치 타겟 */
+  }
+  .layout { display: flex; min-height: 100vh; }
+
+  /* ─── Sidebar ─── */
+  .sidebar {
+    width: 220px;
+    background: #1f2937;
+    color: #d1d5db;
+    padding: 16px 0;
+  }
+  .sidebar .brand {
+    padding: 0 16px 16px;
+    border-bottom: 1px solid #374151;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .sidebar .section-label {
+    padding: 16px 16px 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #6b7280;
+    letter-spacing: 0.5px;
+  }
+  .sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    color: #d1d5db;
+    text-decoration: none;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .sidebar a:hover { background: #374151; color: #fff; }
+  .sidebar a.dim { color: #6b7280; }
+  .sidebar a.active {
+    background: #2563eb;
+    color: #fff;
+    border-left: 3px solid #93c5fd;
+    padding-left: 13px;
+  }
+  .sidebar .nested { padding-left: 24px; font-size: 12.5px; }
+  .badge-new {
+    background: #ef4444; color: #fff;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-left: 6px;
+  }
+
+  /* ── Inference 그룹 (트리 스타일) ── */
+  .sidebar .group-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px 6px;
+    font-size: 12px;
+    color: #93c5fd;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+  }
+  .sidebar .group-header .chevron {
+    font-size: 10px;
+    transition: transform 0.15s;
+    color: #6b7280;
+  }
+  .sidebar .group-header.collapsed .chevron {
+    transform: rotate(-90deg);
+  }
+  .sidebar .group-children {
+    border-left: 1px solid #374151;
+    margin-left: 22px;
+    padding-left: 0;
+  }
+  .sidebar .group-children.collapsed {
+    display: none;
+  }
+  .sidebar .group-children a {
+    padding-left: 14px;
+    font-size: 12.5px;
+    position: relative;
+  }
+  .sidebar .group-children a::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 8px;
+    height: 1px;
+    background: #374151;
+  }
+  .sidebar .group-children a.active {
+    border-left: 3px solid #93c5fd;
+    padding-left: 11px;
+  }
+
+  /* ─── Main ─── */
+  .main { flex: 1; padding: 24px 32px; overflow-y: auto; }
+  .breadcrumb {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 8px;
+  }
+  .page-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .page-subtitle {
+    color: #6b7280;
+    font-size: 12.5px;
+    margin-bottom: 24px;
+  }
+
+  /* ─── Cards ─── */
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+  .card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .card:hover {
+    border-color: #2563eb;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+    transform: translateY(-1px);
+  }
+  .card .icon {
+    width: 36px; height: 36px;
+    background: #eff6ff;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+  .card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .card p {
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.5;
+  }
+  .card .url {
+    font-family: "Consolas", monospace;
+    font-size: 11px;
+    color: #2563eb;
+    margin-top: 10px;
+    background: #f9fafb;
+    padding: 4px 6px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  /* ─── Section ─── */
+  .section { margin-bottom: 32px; }
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title .num {
+    background: #2563eb; color: #fff;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+  }
+
+  /* ─── Detail panel ─── */
+  .panel {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 18px;
+  }
+  .panel h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #374151;
+  }
+  .tab-row {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .tab {
+    padding: 8px 14px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: #6b7280;
+    font-size: 12.5px;
+  }
+  .tab.active {
+    color: #2563eb;
+    border-color: #2563eb;
+    font-weight: 600;
+  }
+
+  /* ─── Table ─── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  th {
+    background: #f9fafb;
+    text-align: left;
+    padding: 10px 12px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 12px;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11.5px;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .status.run { background: #d1fae5; color: #065f46; }
+  .status.ready { background: #dbeafe; color: #1e40af; }
+  .status.pending { background: #fef3c7; color: #92400e; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dot.green { background: #10b981; }
+  .dot.blue { background: #3b82f6; }
+  .dot.yellow { background: #f59e0b; }
+
+  /* ── Source 배지 ── */
+  .src-badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+  .src-badge.hf       { background: #fef3c7; color: #92400e; }
+  .src-badge.trained  { background: #dcfce7; color: #166534; }
+  .src-badge.manual   { background: #e0e7ff; color: #3730a3; }
+
+  /* ─── Wizard ─── */
+  .wizard-steps {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #9ca3af;
+    font-size: 12px;
+  }
+  .step .circle {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    color: #6b7280;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .step.active { color: #2563eb; font-weight: 600; }
+  .step.active .circle { background: #2563eb; color: #fff; }
+  .step.done .circle { background: #10b981; color: #fff; }
+  .step.done { color: #10b981; }
+  .step-divider {
+    flex: 1;
+    height: 2px;
+    background: #e5e7eb;
+    max-width: 60px;
+  }
+
+  /* ─── Form ─── */
+  .form-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .form-row label {
+    font-size: 12.5px;
+    color: #374151;
+    font-weight: 500;
+  }
+  .form-row input,
+  .form-row select,
+  .form-row textarea {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    font-size: 12.5px;
+    font-family: inherit;
+  }
+  .form-row .hint {
+    grid-column: 2;
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+  .radio-group {
+    display: flex; gap: 14px;
+  }
+  .radio-group label {
+    display: flex; align-items: center; gap: 6px;
+    font-weight: 400; cursor: pointer;
+  }
+
+  /* ── Framework card grid ── */
+  .fw-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+  .fw-card {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 10px 8px;
+    text-align: center;
+    cursor: pointer;
+    background: #fff;
+    transition: all 0.12s;
+    position: relative;
+  }
+  .fw-card input { position: absolute; opacity: 0; pointer-events: none; }
+  .fw-card:hover { border-color: #93c5fd; background: #f9fafb; }
+  .fw-card.active {
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: 0 0 0 1px #2563eb inset;
+  }
+  .fw-card.active::after {
+    content: '✓';
+    position: absolute;
+    top: 4px; right: 6px;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .fw-emoji { font-size: 22px; line-height: 1.2; }
+  .fw-name { font-size: 12.5px; font-weight: 600; margin-top: 2px; }
+  .fw-tag { font-size: 10.5px; color: #6b7280; margin-top: 2px; }
+
+  .btn {
+    padding: 7px 14px;
+    border-radius: 5px;
+    font-size: 12.5px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-primary { background: #2563eb; color: #fff; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-secondary { background: #fff; color: #374151; border-color: #d1d5db; }
+  .btn-secondary:hover { background: #f9fafb; }
+  .btn-row { display: flex; justify-content: space-between; margin-top: 18px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
+
+  /* ─── Misc ─── */
+  .hidden { display: none !important; }
+  .total-gpu-callout {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    margin: 6px 0 12px;
+    color: #1e40af;
+  }
+  .yaml-preview {
+    background: #1e293b;
+    color: #cbd5e1;
+    font-family: "Consolas", monospace;
+    font-size: 11.5px;
+    padding: 12px;
+    border-radius: 5px;
+    line-height: 1.5;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .endpoint-box {
+    display: flex; align-items: center; gap: 8px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-family: "Consolas", monospace;
+    font-size: 11.5px;
+    margin-bottom: 8px;
+  }
+  .chat-area {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 12px;
+    min-height: 180px;
+    margin-bottom: 8px;
+  }
+  .chat-bubble {
+    padding: 8px 12px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    max-width: 80%;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+  .chat-bubble.user { background: #2563eb; color: #fff; margin-left: auto; }
+  .chat-bubble.bot { background: #fff; border: 1px solid #e5e7eb; }
+  .api-info {
+    background: #f9fafb;
+    border-radius: 5px;
+    padding: 8px 12px;
+    font-size: 11.5px;
+    color: #6b7280;
+    margin-top: 8px;
+    font-family: "Consolas", monospace;
+  }
+
+  /* nav buttons */
+  .view-nav {
+    display: flex; gap: 8px;
+    background: #fff;
+    padding: 10px 32px;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .view-nav button {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: #374151;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .view-nav button.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .meta-row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    padding: 6px 0;
+    font-size: 12.5px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .meta-row .label { color: #6b7280; }
+  .meta-row .value { color: #111827; font-weight: 500; }
+
+  /* ════════════ 햄버거 + 사이드바 오버레이 ════════════ */
+  .hamburger {
+    display: none;
+    position: fixed;
+    top: 10px; left: 10px;
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    background: #1f2937;
+    color: #fff;
+    align-items: center; justify-content: center;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 200;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 90;
+  }
+  .sidebar-backdrop.open { display: block; }
+
+  /* ════════════ 반응형 (≤ 768px) ════════════ */
+  @media (max-width: 768px) {
+    body { font-size: 12.5px; }
+
+    .hamburger { display: flex; }
+
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 100vh;
+      width: 240px;
+      z-index: 100;
+      transform: translateX(-100%);
+      transition: transform 0.22s ease;
+      overflow-y: auto;
+    }
+    .sidebar.open { transform: translateX(0); }
+
+    .main {
+      padding: 56px 14px 24px;  /* 햄버거 자리 확보 */
+    }
+
+    .page-title { font-size: 17px; }
+    .page-subtitle { font-size: 12px; }
+    .breadcrumb { font-size: 11px; }
+
+    /* 그리드 모두 1열로 */
+    .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 12px; }
+    .fw-grid { grid-template-columns: repeat(2, 1fr); }
+
+    /* 폼: 라벨 위로, 입력 아래로 */
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+    .form-row .hint { grid-column: 1; }
+    .form-row label { font-size: 12px; }
+
+    /* 라디오 그룹 wrap */
+    .radio-group { flex-wrap: wrap; gap: 10px; }
+
+    /* 패널 / 카드 패딩 축소 */
+    .panel { padding: 12px; }
+    .card { padding: 14px; }
+
+    /* 테이블: 가로 스크롤 */
+    .panel > table,
+    .panel > .table-wrap {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    th, td { padding: 8px 10px; font-size: 11.5px; }
+
+    /* Wizard 스텝 인디케이터 — 글자 숨기고 동그라미만 */
+    .wizard-steps { gap: 4px; }
+    .step span:not(.circle) { display: none; }
+    .step-divider { max-width: 30px; }
+
+    /* 탭 행 가로 스크롤 */
+    .tab-row {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 0;
+    }
+    .tab { white-space: nowrap; padding: 8px 10px; font-size: 12px; }
+
+    /* YAML preview 가로 스크롤 + 폰트 축소 */
+    .yaml-preview { font-size: 10.5px; max-height: 320px; }
+
+    /* meta-row: 라벨/값 1열로 안 가도록 유지하되 라벨 폭 축소 */
+    .meta-row {
+      grid-template-columns: 95px 1fr;
+      font-size: 12px;
+    }
+
+    /* 헤더 액션 영역 wrap */
+    .panel > div[style*="justify-content:space-between"] {
+      flex-wrap: wrap;
+    }
+
+    /* 챗 영역 입력바 */
+    .chat-bubble { max-width: 92%; font-size: 12px; }
+
+    /* Endpoint 박스 줄바꿈 */
+    .endpoint-box { flex-wrap: wrap; word-break: break-all; }
+
+    /* 사이드바 그룹 children — 들여쓰기 약간 축소 */
+    .sidebar .group-children { margin-left: 18px; }
+  }
+
+  @media (max-width: 480px) {
+    .fw-grid { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .wizard-steps .step .circle { width: 22px; height: 22px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()" aria-label="메뉴 열기">☰</button>
+<div class="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
+<div class="layout">
+
+  <!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+  <aside class="sidebar">
+    <div class="brand">⬡ bizkube MLOps</div>
+
+    <div class="section-label">GPU</div>
+    <a class="dim" data-view="dashboard">📊 Dashboard</a>
+    <a class="dim" data-view="workload">🏃 Workload</a>
+    <a class="dim" data-view="workload-history">📜 Workload History</a>
+
+    <div class="group-header" id="inference-header" onclick="toggleInference()">
+      <span class="chevron">▼</span>
+      <span>✨ Inference</span>
+      <span class="badge-new">NEW</span>
+    </div>
+    <div class="group-children" id="inference-children">
+      <a data-view="deployments">📦 Deployments</a>
+      <a class="active" data-view="models">🤗 Models</a>
+      <a data-view="templates">📋 Framework Templates</a>
+    </div>
+
+    <div class="section-label">기타</div>
+    <a class="dim" data-view="template">📋 Template</a>
+    <a class="dim" data-view="project">📁 Project</a>
+    <a class="dim" data-view="asset">💾 Asset</a>
+  </aside>
+
+  <!-- ═══════════════════ MAIN ═══════════════════ -->
+  <main class="main">
+
+    <!-- ─── ④ Deployments 리스트 ─── -->
+    <section id="view-deployments" class="view hidden">
+      <div class="breadcrumb">GPU › Inference › Deployments</div>
+      <div class="page-title">Inference Deployments</div>
+      <div class="page-subtitle">vLLM / SGLang 기반 추론 서비스 배포 현황</div>
+
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+          <div style="display:flex;gap:8px">
+            <select><option>전체 프로젝트 ▼</option></select>
+            <select><option>전체 클러스터 ▼</option></select>
+            <select><option>전체 상태 ▼</option></select>
+            <input type="text" placeholder="검색..." style="padding:6px 10px;border:1px solid #d1d5db;border-radius:5px">
+          </div>
+          <button class="btn btn-primary" onclick="show('wizard1')">+ 추론 신청</button>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Model</th>
+              <th>Framework</th>
+              <th>GPU</th>
+              <th>Replicas</th>
+              <th>Endpoint</th>
+              <th>Status</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="show('detail')">
+              <td><b>gpt120-prod</b></td>
+              <td>gpt-oss-120b</td>
+              <td>vLLM</td>
+              <td>4×H100</td>
+              <td>2 / 2</td>
+              <td><code style="font-size:11px">infer.cluster01.../v1</code></td>
+              <td><span class="status run"><span class="dot green"></span>Running</span></td>
+              <td>2026-05-10</td>
+            </tr>
+            <tr>
+              <td><b>llama-dev</b></td>
+              <td>llama-3-8b</td>
+              <td>SGLang</td>
+              <td>1×H100</td>
+              <td>1 / 1</td>
+              <td><code style="font-size:11px">infer.cluster01.../v1</code></td>
+              <td><span class="status ready"><span class="dot blue"></span>Ready</span></td>
+              <td>2026-05-08</td>
+            </tr>
+            <tr>
+              <td><b>bge-embed</b></td>
+              <td>bge-m3</td>
+              <td>vLLM</td>
+              <td>1×H100</td>
+              <td>3 / 3</td>
+              <td><code style="font-size:11px">infer.cluster01.../v1</code></td>
+              <td><span class="status run"><span class="dot green"></span>Running</span></td>
+              <td>2026-05-05</td>
+            </tr>
+            <tr>
+              <td><b>mistral-test</b></td>
+              <td>mistral-7b</td>
+              <td>vLLM</td>
+              <td>2×H100</td>
+              <td>0 / 1</td>
+              <td>—</td>
+              <td><span class="status pending"><span class="dot yellow"></span>Pending</span></td>
+              <td>2026-05-13</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ─── 2. Wizard Step 1 ─── -->
+    <section id="view-wizard1" class="view hidden">
+      <div class="breadcrumb">GPU › Inference › Deployments › 추론 신청</div>
+      <div class="page-title">추론 배포 신청</div>
+
+      <div class="wizard-steps">
+        <div class="step active"><div class="circle">1</div>기본 정보</div>
+        <div class="step-divider"></div>
+        <div class="step"><div class="circle">2</div>모델 & 프레임워크</div>
+        <div class="step-divider"></div>
+        <div class="step"><div class="circle">3</div>자원</div>
+      </div>
+
+      <div class="panel">
+        <h4>1. 기본 정보</h4>
+        <div class="form-row">
+          <label>K8s Cluster *</label>
+          <select><option>cluster01 (mlops)</option><option>cluster02 (dev)</option></select>
+          <div class="hint">먼저 클러스터를 선택하세요. 프로젝트(namespace) 목록이 클러스터 기준으로 채워집니다</div>
+        </div>
+        <div class="form-row">
+          <label>프로젝트 *</label>
+          <select>
+            <option>mlteam-prj</option>
+            <option>research-prj</option>
+            <option>infer-shared-prj</option>
+          </select>
+          <div class="hint">선택한 클러스터의 namespace 중 본인이 권한 있는 항목만 표시</div>
+        </div>
+        <div class="form-row">
+          <label>배포 ID *</label>
+          <input value="mlteam-prj-gpt120">
+          <div class="hint">소문자/숫자/하이픈만, 프로젝트 prefix 자동 적용</div>
+        </div>
+        <div class="form-row">
+          <label>설명</label>
+          <textarea rows="2" placeholder="배포에 대한 짧은 설명"></textarea>
+        </div>
+        <div class="form-row">
+          <label>담당자</label>
+          <input value="jhchoi" readonly style="background:#f9fafb">
+          <div class="hint">기본은 본인 (Keycloak 사용자). 관리자만 변경 가능</div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="show('deployments')">취소</button>
+          <button class="btn btn-primary" onclick="show('wizard2')">다음 →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 3. Wizard Step 2 ─── -->
+    <section id="view-wizard2" class="view hidden">
+      <div class="breadcrumb">GPU › Inference › Deployments › 추론 신청</div>
+      <div class="page-title">추론 배포 신청</div>
+
+      <div class="wizard-steps">
+        <div class="step done"><div class="circle">✓</div>기본 정보</div>
+        <div class="step-divider"></div>
+        <div class="step active"><div class="circle">2</div>모델 & 프레임워크</div>
+        <div class="step-divider"></div>
+        <div class="step"><div class="circle">3</div>자원</div>
+      </div>
+
+      <div class="panel">
+        <h4>2. 모델 & 프레임워크</h4>
+        <div class="form-row">
+          <label>Model *</label>
+          <select>
+            <optgroup label="🤗 HuggingFace">
+              <option>gpt-oss-120b</option>
+              <option>llama-3-8b</option>
+              <option>bge-m3</option>
+            </optgroup>
+            <optgroup label="🎯 학습 산출물">
+              <option>text-classifier-v1 (ONNX)</option>
+              <option>resnet50-finetune (TensorRT)</option>
+            </optgroup>
+            <optgroup label="📁 수동 업로드">
+              <option>yolo-v8 (ONNX)</option>
+            </optgroup>
+          </select>
+          <div class="hint">선택한 모델의 형식에 맞는 Framework 만 활성화됩니다. <a href="#" style="color:#2563eb" onclick="show('model-register');return false">+ 새 모델 등록</a></div>
+        </div>
+        <div class="form-row">
+          <label>Framework *</label>
+          <div class="fw-grid">
+            <label class="fw-card active">
+              <input type="radio" name="fw" checked onchange="setFw('vllm')">
+              <div class="fw-emoji">🚀</div>
+              <div class="fw-name">vLLM</div>
+              <div class="fw-tag">LLM</div>
+            </label>
+            <label class="fw-card">
+              <input type="radio" name="fw" onchange="setFw('sglang')">
+              <div class="fw-emoji">⚡</div>
+              <div class="fw-name">SGLang</div>
+              <div class="fw-tag">LLM</div>
+            </label>
+            <label class="fw-card">
+              <input type="radio" name="fw" onchange="setFw('triton')">
+              <div class="fw-emoji">🔺</div>
+              <div class="fw-name">Triton</div>
+              <div class="fw-tag">ONNX / TRT / PT</div>
+            </label>
+            <label class="fw-card">
+              <input type="radio" name="fw" onchange="setFw('torchserve')">
+              <div class="fw-emoji">🔥</div>
+              <div class="fw-name">TorchServe</div>
+              <div class="fw-tag">PyTorch .mar</div>
+            </label>
+            <label class="fw-card">
+              <input type="radio" name="fw" onchange="setFw('custom')">
+              <div class="fw-emoji">🛠</div>
+              <div class="fw-name">Custom</div>
+              <div class="fw-tag">자유 이미지</div>
+            </label>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>템플릿 (선택)</label>
+          <select><option>(없음 — 직접 설정)</option><option>120B MoE 권장</option><option>8B 모델 권장</option><option>Triton ONNX 권장</option></select>
+        </div>
+
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:18px 0">
+
+        <!-- ── (A) vLLM ── -->
+        <div id="fw-vllm">
+          <h4>🚀 vLLM 설정</h4>
+          <div class="grid-2">
+            <div>
+              <div class="form-row"><label>tensor-parallel</label><input value="4"></div>
+              <div class="form-row"><label>max-model-len</label><input value="8192"></div>
+              <div class="form-row"><label>dtype</label>
+                <select><option>auto</option><option>float16</option><option>bfloat16</option></select>
+              </div>
+              <div class="form-row"><label>quantization</label>
+                <select><option>none</option><option>awq</option><option>gptq</option></select>
+              </div>
+              <div class="form-row"><label>gpu-mem-util</label><input value="0.9"></div>
+              <div class="form-row"><label>추가 args</label><input placeholder="--trust-remote-code ..."></div>
+            </div>
+            <div>
+              <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">YAML 미리보기</div>
+              <div class="yaml-preview">apiVersion: apps/v1
+kind: Deployment
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:latest
+        args:
+        - --model=gpt-oss-120b
+        - --tensor-parallel-size=4
+        - --max-model-len=8192
+        - --gpu-memory-utilization=0.9
+        resources:
+          limits:
+            nvidia.com/gpu: 4</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── (B) SGLang ── -->
+        <div id="fw-sglang" class="hidden">
+          <h4>⚡ SGLang 설정</h4>
+          <div class="grid-2">
+            <div>
+              <div class="form-row"><label>tp-size</label><input value="2"></div>
+              <div class="form-row"><label>context-length</label><input value="8192"></div>
+              <div class="form-row"><label>dtype</label>
+                <select><option>auto</option><option>bfloat16</option><option>float16</option></select>
+              </div>
+              <div class="form-row"><label>max-running-req</label><input value="256"></div>
+              <div class="form-row"><label>chunked-prefill</label><input value="8192"></div>
+              <div class="form-row"><label>추가 args</label><input placeholder="--enable-torch-compile ..."></div>
+            </div>
+            <div>
+              <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">YAML 미리보기</div>
+              <div class="yaml-preview">spec:
+  containers:
+  - name: sglang
+    image: lmsysorg/sglang:latest
+    args:
+    - python3
+    - -m
+    - sglang.launch_server
+    - --model-path=llama-3-8b
+    - --tp=2
+    - --context-length=8192
+    - --max-running-requests=256</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── (C) Triton ── -->
+        <div id="fw-triton" class="hidden">
+          <h4>🔺 Triton Inference Server 설정</h4>
+          <div style="background:#fffbeb;border:1px solid #fde68a;padding:8px 10px;border-radius:5px;font-size:11.5px;color:#92400e;margin-bottom:12px">
+            💡 ONNX / TensorRT / TorchScript / TensorFlow SavedModel / OpenVINO 모델 서빙용
+          </div>
+          <div class="grid-2">
+            <div>
+              <div class="form-row">
+                <label>model-repository</label>
+                <input value="pvc://mlteam-prj-models-pvc/triton-repo/" readonly style="background:#f9fafb">
+                <div class="hint">선택한 모델의 위치를 기반으로 자동 구성</div>
+              </div>
+              <div class="form-row">
+                <label>backend</label>
+                <select>
+                  <option>onnxruntime</option>
+                  <option>tensorrt</option>
+                  <option>pytorch (libtorch)</option>
+                  <option>tensorflow</option>
+                  <option>openvino</option>
+                </select>
+              </div>
+              <div class="form-row"><label>max-batch-size</label><input value="32"></div>
+              <div class="form-row">
+                <label>dynamic-batching</label>
+                <div class="radio-group">
+                  <label><input type="radio" name="dynbatch" checked> ON</label>
+                  <label><input type="radio" name="dynbatch"> OFF</label>
+                </div>
+              </div>
+              <div class="form-row"><label>preferred-batch</label><input value="4, 8, 16"></div>
+              <div class="form-row"><label>max-queue-delay (μs)</label><input value="100"></div>
+              <div class="form-row">
+                <label>instance-group</label>
+                <input value="count=2, kind=GPU">
+                <div class="hint">GPU 당 인스턴스 수. KIND_CPU 도 지원</div>
+              </div>
+              <div class="form-row">
+                <label>version-policy</label>
+                <select><option>latest:1</option><option>all</option><option>specific:[1,3]</option></select>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">config.pbtxt 미리보기</div>
+              <div class="yaml-preview">name: "text-classifier-v1"
+platform: "onnxruntime_onnx"
+max_batch_size: 32
+
+input [
+  {
+    name: "input_ids"
+    data_type: TYPE_INT64
+    dims: [ 512 ]
+  }
+]
+output [
+  {
+    name: "logits"
+    data_type: TYPE_FP32
+    dims: [ 2 ]
+  }
+]
+
+dynamic_batching {
+  preferred_batch_size: [ 4, 8, 16 ]
+  max_queue_delay_microseconds: 100
+}
+
+instance_group [
+  {
+    count: 2
+    kind: KIND_GPU
+  }
+]
+
+version_policy {
+  latest { num_versions: 1 }
+}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── (D) TorchServe ── -->
+        <div id="fw-torchserve" class="hidden">
+          <h4>🔥 TorchServe 설정</h4>
+          <div style="background:#fffbeb;border:1px solid #fde68a;padding:8px 10px;border-radius:5px;font-size:11.5px;color:#92400e;margin-bottom:12px">
+            💡 PyTorch .mar (또는 .pt + handler) 모델 서빙용
+          </div>
+          <div class="grid-2">
+            <div>
+              <div class="form-row">
+                <label>model-store</label>
+                <input value="pvc://mlteam-prj-models-pvc/torchserve/" readonly style="background:#f9fafb">
+              </div>
+              <div class="form-row"><label>model-name</label><input value="resnet50-finetune"></div>
+              <div class="form-row">
+                <label>handler</label>
+                <select><option>image_classifier</option><option>object_detector</option><option>text_classifier</option><option>custom</option></select>
+              </div>
+              <div class="form-row"><label>min-workers</label><input value="1"></div>
+              <div class="form-row"><label>max-workers</label><input value="4"></div>
+              <div class="form-row"><label>batch-size</label><input value="8"></div>
+              <div class="form-row"><label>max-batch-delay (ms)</label><input value="50"></div>
+              <div class="form-row"><label>response-timeout (s)</label><input value="120"></div>
+            </div>
+            <div>
+              <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">config.properties 미리보기</div>
+              <div class="yaml-preview">inference_address=http://0.0.0.0:8080
+management_address=http://0.0.0.0:8081
+model_store=/mnt/torchserve
+
+models={\
+  "resnet50-finetune": {\
+    "1.0": {\
+      "defaultVersion": true,\
+      "marName": "resnet50.mar",\
+      "minWorkers": 1,\
+      "maxWorkers": 4,\
+      "batchSize": 8,\
+      "maxBatchDelay": 50,\
+      "responseTimeout": 120\
+    }\
+  }\
+}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── (E) Custom ── -->
+        <div id="fw-custom" class="hidden">
+          <h4>🛠 Custom 컨테이너</h4>
+          <div class="form-row">
+            <label>이미지 *</label>
+            <input placeholder="예: my-registry/custom-server:v1">
+          </div>
+          <div class="form-row">
+            <label>Command</label>
+            <input placeholder="예: /app/start.sh">
+          </div>
+          <div class="form-row">
+            <label>Args</label>
+            <textarea rows="3" placeholder="한 줄에 하나씩"></textarea>
+          </div>
+          <div class="form-row">
+            <label>포트 *</label>
+            <input value="8000" style="max-width:120px">
+          </div>
+          <div class="form-row">
+            <label>YAML 전체 편집</label>
+            <textarea rows="6" placeholder="고급 사용자: Deployment manifest 직접 작성"></textarea>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="show('wizard1')">← 이전</button>
+          <button class="btn btn-primary" onclick="show('wizard3')">다음 →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 4. Wizard Step 3 ─── -->
+    <section id="view-wizard3" class="view hidden">
+      <div class="breadcrumb">GPU › Inference › Deployments › 추론 신청</div>
+      <div class="page-title">추론 배포 신청</div>
+
+      <div class="wizard-steps">
+        <div class="step done"><div class="circle">✓</div>기본 정보</div>
+        <div class="step-divider"></div>
+        <div class="step done"><div class="circle">✓</div>모델 & 프레임워크</div>
+        <div class="step-divider"></div>
+        <div class="step active"><div class="circle">3</div>자원</div>
+      </div>
+
+      <div class="panel">
+        <h4>3. 자원 설정</h4>
+
+        <div style="font-size:12px;font-weight:600;color:#6b7280;margin:12px 0 8px">▸ CPU / Memory</div>
+        <div class="grid-2">
+          <div class="form-row"><label>CPU req</label><input value="4"></div>
+          <div class="form-row"><label>CPU limit</label><input value="8"></div>
+          <div class="form-row"><label>Memory req</label><input value="32Gi"></div>
+          <div class="form-row"><label>Memory limit</label><input value="64Gi"></div>
+        </div>
+        <div class="form-row">
+          <label>Shared Memory</label>
+          <div class="radio-group">
+            <label><input type="radio" name="shm" checked> ON</label>
+            <label><input type="radio" name="shm"> OFF</label>
+          </div>
+          <div class="hint">ON 시 <code>/dev/shm</code> 을 메모리 기반 emptyDir 로 마운트 (PyTorch DataLoader 권장)</div>
+        </div>
+
+        <div style="font-size:12px;font-weight:600;color:#6b7280;margin:18px 0 8px">▸ GPU</div>
+        <div class="form-row">
+          <label>GPU 수 (per replica) *</label>
+          <input value="4" style="max-width:120px">
+        </div>
+        <div class="form-row">
+          <label>GPU Type *</label>
+          <select style="max-width:240px"><option>H100</option><option>H200</option><option>RTX-PRO-6000</option></select>
+        </div>
+
+        <div style="font-size:12px;font-weight:600;color:#6b7280;margin:18px 0 8px">▸ Replicas</div>
+        <div class="form-row">
+          <label>Replicas *</label>
+          <input value="2" style="max-width:120px">
+          <div class="hint">서비스 가용성을 위해 2 이상 권장</div>
+        </div>
+
+        <div class="total-gpu-callout">
+          🎯 <b>Total GPUs: 8</b> &nbsp;(= 4 GPU/replica × 2 replicas) &nbsp; · &nbsp; 클러스터 free: 12 GPU ✅
+        </div>
+
+        <div style="font-size:12px;font-weight:600;color:#6b7280;margin:18px 0 8px">▸ Volumes</div>
+        <button class="btn btn-secondary" style="font-size:12px">+ 볼륨 추가 (PVC / hostPath / S3)</button>
+
+        <div style="font-size:12px;font-weight:600;color:#6b7280;margin:18px 0 8px">▸ Deployment Specification</div>
+        <div class="form-row">
+          <label>Prometheus Metric</label>
+          <div class="radio-group">
+            <label><input type="radio" name="prom" checked> ON</label>
+            <label><input type="radio" name="prom"> OFF</label>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>HPA (Auto-scaling)</label>
+          <div class="radio-group">
+            <label><input type="radio" name="hpa"> ON</label>
+            <label><input type="radio" name="hpa" checked> OFF</label>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="show('wizard2')">← 이전</button>
+          <button class="btn btn-primary" onclick="show('deployments')">배포</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 5. Deploy 상세 ─── -->
+    <section id="view-detail" class="view hidden">
+      <div class="breadcrumb">GPU › Inference › Deployments › gpt120-prod</div>
+      <div class="page-title">gpt120-prod <span class="status run" style="font-size:12px;margin-left:8px"><span class="dot green"></span>Running</span></div>
+      <div class="page-subtitle">gpt-oss-120b · vLLM · 4×H100 × 2 replicas</div>
+
+      <div class="tab-row" data-tab-group="detail">
+        <div class="tab active" data-tab="overview">개요</div>
+        <div class="tab" data-tab="yaml">YAML</div>
+        <div class="tab" data-tab="settings">생성 설정</div>
+        <div class="tab" data-tab="pods">자원 (Pods)</div>
+        <div class="tab" data-tab="monitoring">모니터링</div>
+        <div class="tab" data-tab="logs">로그</div>
+        <div class="tab" data-tab="alert">Alert</div>
+        <div class="tab" style="color:#ef4444;font-weight:600" onclick="show('playground')">✨ Playground</div>
+      </div>
+
+      <!-- ── 탭: 개요 ── -->
+      <div class="tab-pane" data-pane="overview">
+        <div class="grid-2">
+          <div class="panel">
+            <h4>기본 정보</h4>
+            <div class="meta-row"><span class="label">Project</span><span class="value">mlteam-prj</span></div>
+            <div class="meta-row"><span class="label">Cluster</span><span class="value">cluster01 (mlops)</span></div>
+            <div class="meta-row"><span class="label">Model</span><span class="value">gpt-oss-120b (240GB, 120B params)</span></div>
+            <div class="meta-row"><span class="label">Framework</span><span class="value">vLLM</span></div>
+            <div class="meta-row"><span class="label">Created by</span><span class="value">jhchoi</span></div>
+            <div class="meta-row"><span class="label">Created at</span><span class="value">2026-05-10 14:23</span></div>
+          </div>
+          <div class="panel">
+            <h4>Endpoint</h4>
+            <div class="endpoint-box">
+              <span style="flex:1">https://infer.cluster01.cdp.example.com/mlteam-prj/gpt120-prod/v1</span>
+              <button class="btn btn-secondary" style="padding:3px 8px;font-size:11px">📋 복사</button>
+            </div>
+            <div style="font-size:11.5px;color:#6b7280;margin-bottom:12px">
+              OpenAI-compatible. 사용: <code>POST {endpoint}/chat/completions</code>
+            </div>
+            <h4 style="margin-top:14px">상태</h4>
+            <div class="meta-row"><span class="label">Replicas Ready</span><span class="value">2 / 2 ✅</span></div>
+            <div class="meta-row"><span class="label">GPU 점유</span><span class="value">8 / 8 H100</span></div>
+            <div class="meta-row"><span class="label">최근 헬스체크</span><span class="value">5초 전 OK</span></div>
+            <div class="meta-row"><span class="label">총 요청 (24h)</span><span class="value">12,432 req</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 탭: YAML ── -->
+      <div class="tab-pane hidden" data-pane="yaml">
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <h4 style="margin:0">적용된 K8s Manifest</h4>
+            <div style="display:flex;gap:6px">
+              <select style="padding:4px 8px;font-size:12px;border:1px solid #d1d5db;border-radius:5px">
+                <option>Deployment</option>
+                <option>Service</option>
+                <option>HPA</option>
+                <option>ServiceMonitor</option>
+                <option>모두 (combined)</option>
+              </select>
+              <button class="btn btn-secondary" style="padding:4px 10px;font-size:11.5px">📋 복사</button>
+              <button class="btn btn-secondary" style="padding:4px 10px;font-size:11.5px">⬇ 다운로드</button>
+            </div>
+          </div>
+          <div class="yaml-preview" style="max-height:520px">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gpt120-prod
+  namespace: mlteam-prj
+  labels:
+    app.kubernetes.io/managed-by: bizkube-api
+    inference.bizkube/framework: vllm
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gpt120-prod
+  template:
+    metadata:
+      labels:
+        app: gpt120-prod
+        kai.scheduler/queue: mlteam-prj
+    spec:
+      schedulerName: kai-scheduler
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.6.3
+        args:
+        - --model=gpt-oss-120b
+        - --tensor-parallel-size=4
+        - --max-model-len=8192
+        - --dtype=auto
+        - --gpu-memory-utilization=0.9
+        - --port=8000
+        ports:
+        - containerPort: 8000
+        env:
+        - name: HF_HOME
+          value: /models/cache
+        resources:
+          requests:
+            cpu: "4"
+            memory: 32Gi
+            nvidia.com/gpu: 4
+          limits:
+            cpu: "8"
+            memory: 64Gi
+            nvidia.com/gpu: 4
+        volumeMounts:
+        - name: model-cache
+          mountPath: /models/cache
+        - name: dshm
+          mountPath: /dev/shm
+      volumes:
+      - name: model-cache
+        persistentVolumeClaim:
+          claimName: mlteam-prj-models-pvc
+      - name: dshm
+        emptyDir:
+          medium: Memory
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gpt120-prod
+  namespace: mlteam-prj
+spec:
+  selector:
+    app: gpt120-prod
+  ports:
+  - port: 8000
+    targetPort: 8000</div>
+        </div>
+      </div>
+
+      <!-- ── 탭: 생성 설정 ── -->
+      <div class="tab-pane hidden" data-pane="settings">
+        <div class="grid-2">
+          <div class="panel">
+            <h4>모델 & 프레임워크</h4>
+            <div class="meta-row"><span class="label">Model</span><span class="value">gpt-oss-120b</span></div>
+            <div class="meta-row"><span class="label">Framework</span><span class="value">vLLM 0.6.3</span></div>
+            <div class="meta-row"><span class="label">템플릿</span><span class="value">120B MoE 권장</span></div>
+            <h4 style="margin-top:14px">vLLM 옵션</h4>
+            <div class="meta-row"><span class="label">tensor-parallel</span><span class="value">4</span></div>
+            <div class="meta-row"><span class="label">max-model-len</span><span class="value">8192</span></div>
+            <div class="meta-row"><span class="label">dtype</span><span class="value">auto</span></div>
+            <div class="meta-row"><span class="label">quantization</span><span class="value">none</span></div>
+            <div class="meta-row"><span class="label">gpu-memory-utilization</span><span class="value">0.9</span></div>
+            <div class="meta-row"><span class="label">추가 args</span><span class="value">--enable-expert-parallel</span></div>
+          </div>
+          <div class="panel">
+            <h4>자원</h4>
+            <div class="meta-row"><span class="label">CPU req / lim</span><span class="value">4 / 8</span></div>
+            <div class="meta-row"><span class="label">Memory req / lim</span><span class="value">32Gi / 64Gi</span></div>
+            <div class="meta-row"><span class="label">Shared Memory</span><span class="value">ON (/dev/shm)</span></div>
+            <div class="meta-row"><span class="label">GPU / replica</span><span class="value">4 × H100</span></div>
+            <div class="meta-row"><span class="label">Replicas</span><span class="value">2 (Total GPU 8)</span></div>
+            <h4 style="margin-top:14px">Deployment Specification</h4>
+            <div class="meta-row"><span class="label">Prometheus Metric</span><span class="value">ON</span></div>
+            <div class="meta-row"><span class="label">HPA</span><span class="value">OFF</span></div>
+            <h4 style="margin-top:14px">Volumes</h4>
+            <div class="meta-row"><span class="label">PVC</span><span class="value">mlteam-prj-models-pvc → /models/cache</span></div>
+            <div style="margin-top:16px">
+              <button class="btn btn-primary" style="font-size:12px" onclick="show('wizard1')">🔁 이 설정으로 재신청 (Clone)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 탭: 자원 (Pods) ── -->
+      <div class="tab-pane hidden" data-pane="pods">
+        <div class="panel">
+          <h4>Pod 배치</h4>
+          <table>
+            <thead><tr><th>Pod</th><th>Node</th><th>GPU</th><th>Phase</th><th>Restart</th><th>Started</th><th>CPU/Mem</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>gpt120-prod-7f4a-x9k2</td><td>worker-gpu09</td><td>4 × H100</td>
+                <td><span class="status run"><span class="dot green"></span>Running</span></td><td>0</td>
+                <td>2026-05-10 14:24</td><td>3.2 / 28Gi</td>
+              </tr>
+              <tr>
+                <td>gpt120-prod-7f4a-p3m1</td><td>worker-gpu10</td><td>4 × H100</td>
+                <td><span class="status run"><span class="dot green"></span>Running</span></td><td>0</td>
+                <td>2026-05-10 14:24</td><td>3.4 / 30Gi</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel" style="margin-top:16px">
+          <h4>노드별 GPU 점유 현황</h4>
+          <table>
+            <thead><tr><th>Node</th><th>GPU model</th><th>이 워크로드</th><th>전체 점유 / 가용</th><th>Free</th></tr></thead>
+            <tbody>
+              <tr><td>worker-gpu09</td><td>H100 80GB</td><td>4 GPU</td><td>4 / 8</td><td>4</td></tr>
+              <tr><td>worker-gpu10</td><td>H100 80GB</td><td>4 GPU</td><td>4 / 8</td><td>4</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── 탭: 모니터링 ── -->
+      <div class="tab-pane hidden" data-pane="monitoring">
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <h4 style="margin:0">실시간 메트릭</h4>
+            <div style="display:flex;gap:6px">
+              <select style="padding:4px 8px;font-size:12px;border:1px solid #d1d5db;border-radius:5px">
+                <option>최근 15분</option><option>1시간</option><option>6시간</option><option>24시간</option>
+              </select>
+              <button class="btn btn-secondary" style="padding:4px 10px;font-size:11.5px">Grafana ↗</button>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div style="border:1px solid #e5e7eb;border-radius:6px;padding:12px">
+              <div style="font-size:11.5px;color:#6b7280">Throughput (req/s)</div>
+              <div style="font-size:22px;font-weight:700;color:#2563eb">8.4</div>
+              <div style="height:80px;background:linear-gradient(180deg, #eff6ff 0%, #fff 100%);border-radius:4px;display:flex;align-items:flex-end;padding:6px;gap:3px">
+                <div style="flex:1;background:#93c5fd;height:30%"></div>
+                <div style="flex:1;background:#93c5fd;height:45%"></div>
+                <div style="flex:1;background:#60a5fa;height:60%"></div>
+                <div style="flex:1;background:#60a5fa;height:55%"></div>
+                <div style="flex:1;background:#3b82f6;height:75%"></div>
+                <div style="flex:1;background:#3b82f6;height:70%"></div>
+                <div style="flex:1;background:#2563eb;height:85%"></div>
+                <div style="flex:1;background:#2563eb;height:80%"></div>
+              </div>
+            </div>
+            <div style="border:1px solid #e5e7eb;border-radius:6px;padding:12px">
+              <div style="font-size:11.5px;color:#6b7280">Latency P50 / P95 / P99 (ms)</div>
+              <div style="font-size:22px;font-weight:700;color:#10b981">220 / 480 / 720</div>
+              <div style="height:80px;background:linear-gradient(180deg, #ecfdf5 0%, #fff 100%);border-radius:4px;position:relative">
+                <svg width="100%" height="80" viewBox="0 0 200 80" preserveAspectRatio="none">
+                  <polyline points="0,60 25,55 50,50 75,52 100,48 125,45 150,42 175,40 200,38" fill="none" stroke="#10b981" stroke-width="2"/>
+                  <polyline points="0,35 25,30 50,28 75,32 100,25 125,22 150,20 175,18 200,15" fill="none" stroke="#f59e0b" stroke-width="2"/>
+                  <polyline points="0,15 25,12 50,18 75,10 100,8 125,6 150,4 175,5 200,3" fill="none" stroke="#ef4444" stroke-width="2"/>
+                </svg>
+              </div>
+            </div>
+            <div style="border:1px solid #e5e7eb;border-radius:6px;padding:12px">
+              <div style="font-size:11.5px;color:#6b7280">GPU Utilization</div>
+              <div style="font-size:22px;font-weight:700;color:#f59e0b">82 %</div>
+              <div style="height:80px;display:flex;align-items:flex-end;gap:3px;padding:6px;background:#fef3c7;border-radius:4px">
+                <div style="flex:1;background:#f59e0b;height:78%"></div>
+                <div style="flex:1;background:#f59e0b;height:82%"></div>
+                <div style="flex:1;background:#f59e0b;height:85%"></div>
+                <div style="flex:1;background:#f59e0b;height:80%"></div>
+                <div style="flex:1;background:#f59e0b;height:88%"></div>
+                <div style="flex:1;background:#f59e0b;height:82%"></div>
+                <div style="flex:1;background:#f59e0b;height:75%"></div>
+                <div style="flex:1;background:#f59e0b;height:80%"></div>
+              </div>
+            </div>
+            <div style="border:1px solid #e5e7eb;border-radius:6px;padding:12px">
+              <div style="font-size:11.5px;color:#6b7280">GPU Memory Usage</div>
+              <div style="font-size:22px;font-weight:700;color:#7c3aed">68 / 80 GB</div>
+              <div style="height:80px;background:#f3e8ff;border-radius:4px;padding:6px">
+                <div style="background:#7c3aed;height:100%;width:85%;border-radius:3px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:16px">
+          <h4>요청 통계 (24h)</h4>
+          <div class="grid-3">
+            <div style="text-align:center"><div style="font-size:11.5px;color:#6b7280">총 요청</div><div style="font-size:20px;font-weight:700">12,432</div></div>
+            <div style="text-align:center"><div style="font-size:11.5px;color:#6b7280">성공률</div><div style="font-size:20px;font-weight:700;color:#10b981">99.8 %</div></div>
+            <div style="text-align:center"><div style="font-size:11.5px;color:#6b7280">평균 토큰/req</div><div style="font-size:20px;font-weight:700">512</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 탭: 로그 ── -->
+      <div class="tab-pane hidden" data-pane="logs">
+        <div class="panel">
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+            <select style="padding:5px 10px;font-size:12px;border:1px solid #d1d5db;border-radius:5px">
+              <option>gpt120-prod-7f4a-x9k2 (worker-gpu09)</option>
+              <option>gpt120-prod-7f4a-p3m1 (worker-gpu10)</option>
+            </select>
+            <select style="padding:5px 10px;font-size:12px;border:1px solid #d1d5db;border-radius:5px">
+              <option>최근 100줄</option><option>1,000줄</option><option>모두</option>
+            </select>
+            <input placeholder="키워드 필터..." style="padding:5px 10px;font-size:12px;border:1px solid #d1d5db;border-radius:5px;flex:1">
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px"><input type="checkbox" checked> Follow</label>
+            <button class="btn btn-secondary" style="padding:5px 10px;font-size:11.5px">⬇ 다운로드</button>
+          </div>
+          <div class="yaml-preview" style="max-height:480px;background:#0f172a;color:#94a3b8;font-size:11.5px;line-height:1.5">
+<span style="color:#64748b">2026-05-13 18:42:01</span> <span style="color:#10b981">INFO</span> [vllm.engine] Started engine. model=gpt-oss-120b
+<span style="color:#64748b">2026-05-13 18:42:02</span> <span style="color:#10b981">INFO</span> [vllm.worker] Loaded weights: 240 GB in 38.2s
+<span style="color:#64748b">2026-05-13 18:42:05</span> <span style="color:#10b981">INFO</span> [vllm.api_server] Listening on 0.0.0.0:8000
+<span style="color:#64748b">2026-05-13 18:51:23</span> <span style="color:#10b981">INFO</span> [vllm.engine] req=a3f2c1 prompt_tokens=124 gen_tokens=88 latency=212ms
+<span style="color:#64748b">2026-05-13 18:51:24</span> <span style="color:#10b981">INFO</span> [vllm.engine] req=b8d4e5 prompt_tokens=540 gen_tokens=312 latency=890ms
+<span style="color:#64748b">2026-05-13 18:51:25</span> <span style="color:#f59e0b">WARN</span>  [vllm.scheduler] Queue depth high: 12 (max=16)
+<span style="color:#64748b">2026-05-13 18:51:27</span> <span style="color:#10b981">INFO</span> [vllm.engine] req=c5f7a9 prompt_tokens=82 gen_tokens=140 latency=302ms
+<span style="color:#64748b">2026-05-13 18:51:29</span> <span style="color:#10b981">INFO</span> [vllm.metrics] avg_throughput=8.4 req/s, gpu_util=82%
+<span style="color:#64748b">2026-05-13 18:51:31</span> <span style="color:#ef4444">ERROR</span> [vllm.engine] req=d2e1b4 ContextLengthExceeded: input=9012 > max=8192
+<span style="color:#64748b">2026-05-13 18:51:33</span> <span style="color:#10b981">INFO</span> [vllm.engine] req=e7a3c2 prompt_tokens=210 gen_tokens=512 latency=1240ms
+<span style="color:#64748b">2026-05-13 18:51:35</span> <span style="color:#10b981">INFO</span> [vllm.metrics] avg_throughput=8.6 req/s, gpu_util=85%</div>
+        </div>
+      </div>
+
+      <!-- ── 탭: Alert ── -->
+      <div class="tab-pane hidden" data-pane="alert">
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <h4 style="margin:0">Alert Rules</h4>
+            <button class="btn btn-primary" style="font-size:12px">+ Rule 추가</button>
+          </div>
+          <table>
+            <thead><tr><th>Rule 이름</th><th>조건</th><th>For</th><th>심각도</th><th>알림</th><th>상태</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><b>High P99 Latency</b></td>
+                <td><code style="font-size:11px">p99_latency &gt; 5s</code></td>
+                <td>5m</td>
+                <td><span class="status pending"><span class="dot yellow"></span>Warning</span></td>
+                <td>Slack #mlops</td>
+                <td>✅ Active</td>
+              </tr>
+              <tr>
+                <td><b>Pod Crash</b></td>
+                <td><code style="font-size:11px">restarts &gt; 3</code></td>
+                <td>10m</td>
+                <td><span class="status run" style="background:#fecaca;color:#991b1b"><span class="dot" style="background:#dc2626"></span>Critical</span></td>
+                <td>Slack + Email</td>
+                <td>✅ Active</td>
+              </tr>
+              <tr>
+                <td><b>GPU Mem &gt; 95%</b></td>
+                <td><code style="font-size:11px">gpu_mem_pct &gt; 0.95</code></td>
+                <td>3m</td>
+                <td><span class="status pending"><span class="dot yellow"></span>Warning</span></td>
+                <td>Slack #mlops</td>
+                <td>⏸ Disabled</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel" style="margin-top:16px">
+          <h4>Alert History (최근 7일)</h4>
+          <table>
+            <thead><tr><th>발생 시각</th><th>Rule</th><th>심각도</th><th>지속 시간</th><th>해결</th></tr></thead>
+            <tbody>
+              <tr><td>2026-05-13 14:22</td><td>High P99 Latency</td><td><span class="status pending"><span class="dot yellow"></span>Warning</span></td><td>8m</td><td>✅ Auto</td></tr>
+              <tr><td>2026-05-12 03:45</td><td>GPU Mem &gt; 95%</td><td><span class="status pending"><span class="dot yellow"></span>Warning</span></td><td>2m</td><td>✅ Auto</td></tr>
+              <tr><td>2026-05-10 19:08</td><td>High P99 Latency</td><td><span class="status pending"><span class="dot yellow"></span>Warning</span></td><td>15m</td><td>👤 jhchoi</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 6. Playground ─── -->
+    <section id="view-playground" class="view hidden">
+      <div class="breadcrumb">GPU › Inference › Deployments › gpt120-prod › Playground</div>
+      <div class="page-title">✨ Playground — gpt120-prod</div>
+      <div class="page-subtitle">배포된 모델을 브라우저에서 바로 호출/검증</div>
+
+      <div class="tab-row">
+        <div class="tab" onclick="show('detail')">개요</div>
+        <div class="tab">YAML</div>
+        <div class="tab">생성 설정</div>
+        <div class="tab">자원 (Pods)</div>
+        <div class="tab">모니터링</div>
+        <div class="tab">로그</div>
+        <div class="tab">Alert</div>
+        <div class="tab active">✨ Playground</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <h4>요청</h4>
+          <div class="form-row">
+            <label>Endpoint</label>
+            <select>
+              <option>/v1/chat/completions</option>
+              <option>/v1/completions</option>
+              <option>/v1/embeddings</option>
+              <option>/v1/rerank</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>temperature</label>
+            <input value="0.7" style="max-width:120px">
+          </div>
+          <div class="form-row">
+            <label>max_tokens</label>
+            <input value="512" style="max-width:120px">
+          </div>
+
+          <div style="margin:14px 0 6px;font-weight:600;font-size:12.5px">Chat</div>
+          <div class="chat-area">
+            <div class="chat-bubble user">한국의 수도는?</div>
+            <div class="chat-bubble bot">한국의 수도는 서울특별시입니다. 정치, 경제, 문화의 중심지로 약 950만 명이 거주하고 있습니다.</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <input placeholder="메시지를 입력하세요..." style="flex:1;padding:8px 10px;border:1px solid #d1d5db;border-radius:5px">
+            <button class="btn btn-primary">전송 ▶</button>
+          </div>
+
+          <div class="api-info">
+            ✓ 200 OK · 432ms · 184 tokens · $0.0023
+            <button class="btn btn-secondary" style="float:right;padding:2px 8px;font-size:10px">cURL 복사</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h4>코드 스니펫</h4>
+          <div class="tab-row">
+            <div class="tab active">Python</div>
+            <div class="tab">JavaScript</div>
+            <div class="tab">cURL</div>
+          </div>
+          <div class="yaml-preview" style="max-height:340px">from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://infer.cluster01.../v1",
+    api_key="sk-..."
+)
+
+response = client.chat.completions.create(
+    model="gpt-oss-120b",
+    messages=[
+        {"role": "user", "content": "한국의 수도는?"}
+    ],
+    temperature=0.7,
+    max_tokens=512,
+)
+print(response.choices[0].message.content)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Placeholder (이 mockup 범위 밖 메뉴) ─── -->
+    <section id="view-placeholder" class="view hidden">
+      <div class="breadcrumb">GPU › <span id="placeholder-name">menu</span></div>
+      <div class="page-title" style="text-transform:capitalize"><span id="placeholder-name-2">menu</span></div>
+      <div class="page-subtitle">이 페이지는 본 mockup 범위 밖입니다 (실제 화면은 기존 bz-apps-bizkube2 에 구현되어 있음)</div>
+      <div class="panel" style="text-align:center;padding:48px 24px;color:#9ca3af">
+        <div style="font-size:48px;margin-bottom:8px">🚧</div>
+        <div style="font-size:14px">기존 페이지 (변경 없음)</div>
+        <div style="font-size:12px;margin-top:6px">왼쪽 <b>✨ Inference</b> 섹션을 클릭하면 신규 화면을 볼 수 있습니다</div>
+      </div>
+    </section>
+
+    <!-- ─── Framework Templates ─── -->
+    <section id="view-templates" class="view hidden">
+      <div class="breadcrumb">GPU › Inference › Framework Templates</div>
+      <div class="page-title">Framework Templates</div>
+      <div class="page-subtitle">vLLM / SGLang 설정 묶음. 추론 신청 시 "템플릿 불러오기" 로 한 번에 적용</div>
+
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px">
+          <div style="display:flex;gap:8px">
+            <input placeholder="템플릿 검색..." style="padding:6px 10px;border:1px solid #d1d5db;border-radius:5px;width:220px">
+            <select><option>전체 Framework ▼</option><option>vLLM</option><option>SGLang</option></select>
+            <select><option>전체 카테고리 ▼</option><option>Small (≤10B)</option><option>Medium (10~70B)</option><option>Large (≥70B)</option><option>Embedding</option></select>
+          </div>
+          <button class="btn btn-primary">+ 템플릿 추가</button>
+        </div>
+
+        <div class="grid-3" style="margin-bottom:0">
+
+          <!-- Template 1 -->
+          <div class="card" style="cursor:default;text-align:left">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="icon">🦙</div>
+              <span style="font-size:10.5px;background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:10px">vLLM</span>
+            </div>
+            <h3>Llama 8B 권장</h3>
+            <p>8B 모델용 안정 설정. 단일 H100/A100 1장에 적합.</p>
+            <div style="margin:10px 0;font-size:11.5px;line-height:1.8;font-family:Consolas,monospace;color:#374151">
+              tensor-parallel = 1<br>
+              max-model-len = 8192<br>
+              dtype = bfloat16<br>
+              gpu-memory-utilization = 0.9
+            </div>
+            <div style="font-size:11px;color:#6b7280;border-top:1px solid #f3f4f6;padding-top:8px;margin-top:8px">
+              사용 횟수: 24 · 작성자: admin
+            </div>
+            <div style="display:flex;gap:6px;margin-top:10px">
+              <button class="btn btn-primary" style="flex:1;font-size:11.5px;padding:5px 10px" onclick="show('wizard2')">이 템플릿으로 신청 →</button>
+              <button class="btn btn-secondary" style="font-size:11.5px;padding:5px 10px">편집</button>
+            </div>
+          </div>
+
+          <!-- Template 2 -->
+          <div class="card" style="cursor:default;text-align:left">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="icon">🚀</div>
+              <span style="font-size:10.5px;background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:10px">vLLM</span>
+            </div>
+            <h3>120B MoE 권장</h3>
+            <p>gpt-oss-120b 등 대형 MoE 모델. H100 4장 tensor-parallel.</p>
+            <div style="margin:10px 0;font-size:11.5px;line-height:1.8;font-family:Consolas,monospace;color:#374151">
+              tensor-parallel = 4<br>
+              max-model-len = 8192<br>
+              dtype = bfloat16<br>
+              enable-expert-parallel = true<br>
+              gpu-memory-utilization = 0.92
+            </div>
+            <div style="font-size:11px;color:#6b7280;border-top:1px solid #f3f4f6;padding-top:8px;margin-top:8px">
+              사용 횟수: 12 · 작성자: admin
+            </div>
+            <div style="display:flex;gap:6px;margin-top:10px">
+              <button class="btn btn-primary" style="flex:1;font-size:11.5px;padding:5px 10px" onclick="show('wizard2')">이 템플릿으로 신청 →</button>
+              <button class="btn btn-secondary" style="font-size:11.5px;padding:5px 10px">편집</button>
+            </div>
+          </div>
+
+          <!-- Template 3 -->
+          <div class="card" style="cursor:default;text-align:left">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="icon">📚</div>
+              <span style="font-size:10.5px;background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:10px">vLLM</span>
+            </div>
+            <h3>Long Context (128k)</h3>
+            <p>장문 컨텍스트용. RoPE scaling 으로 max-len 확장.</p>
+            <div style="margin:10px 0;font-size:11.5px;line-height:1.8;font-family:Consolas,monospace;color:#374151">
+              tensor-parallel = 2<br>
+              max-model-len = 131072<br>
+              rope-scaling = {"type":"yarn"}<br>
+              dtype = bfloat16
+            </div>
+            <div style="font-size:11px;color:#6b7280;border-top:1px solid #f3f4f6;padding-top:8px;margin-top:8px">
+              사용 횟수: 7 · 작성자: jhchoi
+            </div>
+            <div style="display:flex;gap:6px;margin-top:10px">
+              <button class="btn btn-primary" style="flex:1;font-size:11.5px;padding:5px 10px" onclick="show('wizard2')">이 템플릿으로 신청 →</button>
+              <button class="btn btn-secondary" style="font-size:11.5px;padding:5px 10px">편집</button>
+            </div>
+          </div>
+
+          <!-- Template 4 -->
+          <div class="card" style="cursor:default;text-align:left">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="icon">🔍</div>
+              <span style="font-size:10.5px;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:10px">SGLang</span>
+            </div>
+            <h3>Embedding 모델 (bge-m3)</h3>
+            <p>임베딩 추출 전용. /v1/embeddings 엔드포인트 활성화.</p>
+            <div style="margin:10px 0;font-size:11.5px;line-height:1.8;font-family:Consolas,monospace;color:#374151">
+              served-model-name = bge-m3<br>
+              is-embedding = true<br>
+              max-running-requests = 256<br>
+              chunked-prefill-size = 8192
+            </div>
+            <div style="font-size:11px;color:#6b7280;border-top:1px solid #f3f4f6;padding-top:8px;margin-top:8px">
+              사용 횟수: 18 · 작성자: admin
+            </div>
+            <div style="display:flex;gap:6px;margin-top:10px">
+              <button class="btn btn-primary" style="flex:1;font-size:11.5px;padding:5px 10px" onclick="show('wizard2')">이 템플릿으로 신청 →</button>
+              <button class="btn btn-secondary" style="font-size:11.5px;padding:5px 10px">편집</button>
+            </div>
+          </div>
+
+          <!-- Template 5 -->
+          <div class="card" style="cursor:default;text-align:left">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="icon">💰</div>
+              <span style="font-size:10.5px;background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:10px">vLLM</span>
+            </div>
+            <h3>저비용 (AWQ 양자화)</h3>
+            <p>AWQ 4-bit 양자화로 VRAM 1/4. 정확도 손해 최소.</p>
+            <div style="margin:10px 0;font-size:11.5px;line-height:1.8;font-family:Consolas,monospace;color:#374151">
+              tensor-parallel = 1<br>
+              quantization = awq<br>
+              dtype = float16<br>
+              max-model-len = 4096
+            </div>
+            <div style="font-size:11px;color:#6b7280;border-top:1px solid #f3f4f6;padding-top:8px;margin-top:8px">
+              사용 횟수: 5 · 작성자: research-team
+            </div>
+            <div style="display:flex;gap:6px;margin-top:10px">
+              <button class="btn btn-primary" style="flex:1;font-size:11.5px;padding:5px 10px" onclick="show('wizard2')">이 템플릿으로 신청 →</button>
+              <button class="btn btn-secondary" style="font-size:11.5px;padding:5px 10px">편집</button>
+            </div>
+          </div>
+
+          <!-- Template 6 -->
+          <div class="card" style="cursor:default;text-align:left">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="icon">⚡</div>
+              <span style="font-size:10.5px;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:10px">SGLang</span>
+            </div>
+            <h3>고속 처리 (구조화 출력)</h3>
+            <p>JSON 스키마 강제 출력. agent / function-calling 용.</p>
+            <div style="margin:10px 0;font-size:11.5px;line-height:1.8;font-family:Consolas,monospace;color:#374151">
+              tensor-parallel = 2<br>
+              enable-torch-compile = true<br>
+              grammar-backend = xgrammar<br>
+              max-running-requests = 128
+            </div>
+            <div style="font-size:11px;color:#6b7280;border-top:1px solid #f3f4f6;padding-top:8px;margin-top:8px">
+              사용 횟수: 3 · 작성자: jhchoi
+            </div>
+            <div style="display:flex;gap:6px;margin-top:10px">
+              <button class="btn btn-primary" style="flex:1;font-size:11.5px;padding:5px 10px" onclick="show('wizard2')">이 템플릿으로 신청 →</button>
+              <button class="btn btn-secondary" style="font-size:11.5px;padding:5px 10px">편집</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:16px;background:#fffbeb;border-color:#fde68a">
+        <div style="font-size:12.5px;color:#92400e">
+          <b>💡 Tip.</b> 신청 마법사 Step 2 에서 <b>"템플릿 불러오기"</b> 선택 시 이 목록이 드롭다운으로 나타납니다.
+          템플릿을 선택하면 vLLM/SGLang 설정값이 일괄 채워지고, 이후 자유롭게 수정 가능합니다.
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── ① Models 리스트 (순수 리스트) ─── -->
+    <section id="view-models" class="view">
+      <div class="breadcrumb">GPU › Inference › Models</div>
+      <div class="page-title">Model Registry</div>
+      <div class="page-subtitle">HuggingFace / 학습 산출물 / 수동 업로드로 등록된 모델 카탈로그</div>
+
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input placeholder="모델명 검색..." style="padding:6px 10px;border:1px solid #d1d5db;border-radius:5px;width:220px">
+            <select>
+              <option>전체 출처 ▼</option>
+              <option>🤗 HuggingFace</option>
+              <option>🎯 학습 산출물</option>
+              <option>📁 수동 업로드</option>
+            </select>
+            <select>
+              <option>전체 형식 ▼</option>
+              <option>HF Transformers</option>
+              <option>ONNX</option>
+              <option>TensorRT</option>
+              <option>TorchScript</option>
+              <option>PyTorch</option>
+              <option>TensorFlow</option>
+            </select>
+            <select><option>전체 Task ▼</option><option>text-generation</option><option>embedding</option><option>text-classification</option><option>image-classification</option><option>object-detection</option></select>
+          </div>
+          <button class="btn btn-primary" onclick="show('model-register')">+ 모델 등록</button>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>모델명</th>
+              <th>출처</th>
+              <th>형식</th>
+              <th>Task</th>
+              <th>크기</th>
+              <th>파라미터</th>
+              <th>등록자</th>
+              <th>배포 중</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- 🤗 HuggingFace -->
+            <tr style="cursor:pointer" onclick="showModelDetail('gpt-oss-120b')">
+              <td><b>gpt-oss-120b</b><br><span style="font-size:11px;color:#6b7280">openai/gpt-oss-120b</span></td>
+              <td><span class="src-badge hf">🤗 HuggingFace</span></td>
+              <td>Transformers</td>
+              <td>text-generation</td>
+              <td>240 GB</td>
+              <td>120 B</td>
+              <td>jhchoi</td>
+              <td>● 3</td>
+            </tr>
+            <tr style="cursor:pointer" onclick="showModelDetail('llama-3-8b')">
+              <td><b>llama-3-8b</b><br><span style="font-size:11px;color:#6b7280">meta-llama/Llama-3-8B</span></td>
+              <td><span class="src-badge hf">🤗 HuggingFace</span></td>
+              <td>Transformers</td>
+              <td>text-generation</td>
+              <td>16 GB</td>
+              <td>8 B</td>
+              <td>admin</td>
+              <td>● 1</td>
+            </tr>
+            <tr style="cursor:pointer" onclick="showModelDetail('bge-m3')">
+              <td><b>bge-m3</b><br><span style="font-size:11px;color:#6b7280">BAAI/bge-m3</span></td>
+              <td><span class="src-badge hf">🤗 HuggingFace</span></td>
+              <td>Transformers</td>
+              <td>embedding</td>
+              <td>2 GB</td>
+              <td>560 M</td>
+              <td>jhchoi</td>
+              <td>● 0</td>
+            </tr>
+
+            <!-- 🎯 학습 산출물 -->
+            <tr style="cursor:pointer" onclick="showModelDetail('text-classifier-v1')">
+              <td><b>text-classifier-v1</b><br><span style="font-size:11px;color:#6b7280">workload: hf-text-classification-7wbw3q</span></td>
+              <td><span class="src-badge trained">🎯 학습 산출물</span></td>
+              <td>ONNX</td>
+              <td>text-classification</td>
+              <td>482 MB</td>
+              <td>110 M</td>
+              <td>jhchoi</td>
+              <td>● 1</td>
+            </tr>
+            <tr style="cursor:pointer" onclick="showModelDetail('resnet50-finetune')">
+              <td><b>resnet50-finetune</b><br><span style="font-size:11px;color:#6b7280">workload: resnet50-train-9k2pq</span></td>
+              <td><span class="src-badge trained">🎯 학습 산출물</span></td>
+              <td>TensorRT</td>
+              <td>image-classification</td>
+              <td>380 MB</td>
+              <td>25 M</td>
+              <td>research-team</td>
+              <td>● 0</td>
+            </tr>
+
+            <!-- 📁 수동 업로드 -->
+            <tr style="cursor:pointer" onclick="showModelDetail('yolo-v8')">
+              <td><b>yolo-v8</b><br><span style="font-size:11px;color:#6b7280">pvc://mlteam-prj-models-pvc/yolo-v8/</span></td>
+              <td><span class="src-badge manual">📁 수동 업로드</span></td>
+              <td>ONNX</td>
+              <td>object-detection</td>
+              <td>132 MB</td>
+              <td>43 M</td>
+              <td>admin</td>
+              <td>● 2</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="font-size:11.5px;color:#6b7280;margin-top:10px">💡 행을 클릭하면 모델 상세 페이지로 이동</div>
+      </div>
+    </section>
+
+    <!-- ─── ② 모델 등록 (별도 페이지) ─── -->
+    <section id="view-model-register" class="view hidden">
+      <div class="breadcrumb">GPU › Inference › Models › 모델 등록</div>
+      <div class="page-title">모델 등록</div>
+      <div class="page-subtitle">출처에 따라 HuggingFace, 학습 산출물, 수동 업로드 중 선택</div>
+
+      <div class="panel">
+        <h4>모델 출처 *</h4>
+        <div class="radio-group" style="margin-bottom:10px">
+          <label><input type="radio" name="src" value="hf" checked onchange="setSrc('hf')"> 🤗 HuggingFace</label>
+          <label><input type="radio" name="src" value="trained" onchange="setSrc('trained')"> 🎯 학습 산출물 (Trained Workload)</label>
+          <label><input type="radio" name="src" value="manual" onchange="setSrc('manual')"> 📁 수동 업로드 (PVC / S3)</label>
+        </div>
+      </div>
+
+      <!-- ── (A) HuggingFace ── -->
+      <div id="src-hf">
+        <div class="panel" style="margin-top:16px">
+          <h4>1단계 · HuggingFace 조회</h4>
+          <div class="form-row">
+            <label>모델명 *</label>
+            <div style="display:flex;gap:6px">
+              <input placeholder="예: meta-llama/Llama-3-8B" style="flex:1" value="meta-llama/Llama-3-8B">
+              <button class="btn btn-primary">🔍 조회</button>
+            </div>
+            <div class="hint">HuggingFace Hub 의 모델 ID (owner/model-name) 또는 키워드</div>
+          </div>
+
+          <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:5px;padding:10px 12px;margin:10px 0">
+            <div style="font-size:11.5px;color:#6b7280;margin-bottom:6px">검색 결과 (3건)</div>
+            <table style="font-size:12px">
+              <tr style="cursor:pointer;background:#eff6ff"><td>✓ meta-llama/Llama-3-8B</td><td>text-generation</td><td>8B</td><td>16GB</td></tr>
+              <tr style="cursor:pointer"><td>&nbsp;&nbsp; meta-llama/Llama-3-8B-Instruct</td><td>text-generation</td><td>8B</td><td>16GB</td></tr>
+              <tr style="cursor:pointer"><td>&nbsp;&nbsp; meta-llama/Meta-Llama-3-70B</td><td>text-generation</td><td>70B</td><td>140GB</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:16px">
+          <h4>2단계 · 메타데이터 확인 (자동 입력 · 수정 가능)</h4>
+          <div class="grid-2">
+            <div>
+              <div class="form-row"><label>모델명</label><input value="meta-llama/Llama-3-8B" readonly style="background:#f9fafb"></div>
+              <div class="form-row"><label>작성자</label><input value="meta-llama" readonly style="background:#f9fafb"></div>
+              <div class="form-row"><label>Task</label><input value="text-generation" readonly style="background:#f9fafb"></div>
+              <div class="form-row"><label>라이브러리</label><input value="transformers" readonly style="background:#f9fafb"></div>
+              <div class="form-row"><label>모델 파일 용량</label><input value="16.07 GB" readonly style="background:#f9fafb"></div>
+            </div>
+            <div>
+              <div class="form-row"><label>파라미터 개수</label><input value="8.03 B" readonly style="background:#f9fafb"></div>
+              <div class="form-row"><label>텐서 타입</label><input value="BF16" readonly style="background:#f9fafb"></div>
+              <div class="form-row"><label>지원 언어</label><input value="en" readonly style="background:#f9fafb"></div>
+              <div class="form-row"><label>라이센스</label><input value="Llama 3 Community" readonly style="background:#f9fafb"></div>
+              <div class="form-row"><label>Base 모델</label><input value="-" readonly style="background:#f9fafb"></div>
+            </div>
+          </div>
+
+          <div class="form-row" style="margin-top:14px">
+            <label>내부 별칭 (선택)</label>
+            <input placeholder="예: llama-3-8b">
+            <div class="hint">조직 내에서 사용할 짧은 이름. 비우면 모델명 그대로 사용</div>
+          </div>
+          <div class="form-row">
+            <label>설명 (선택)</label>
+            <textarea rows="2" placeholder="이 모델의 용도나 특징"></textarea>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-secondary" onclick="show('models')">취소</button>
+            <button class="btn btn-primary" onclick="show('models')">등록</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── (B) 학습 산출물 ── -->
+      <div id="src-trained" class="hidden">
+        <div class="panel" style="margin-top:16px">
+          <h4>1단계 · 학습 Workload 선택</h4>
+          <div class="form-row">
+            <label>Cluster *</label>
+            <select><option>cluster01 (mlops)</option><option>cluster02 (dev)</option></select>
+          </div>
+          <div class="form-row">
+            <label>프로젝트 *</label>
+            <select><option>mlteam-prj</option><option>research-prj</option></select>
+          </div>
+          <div class="form-row">
+            <label>Workload *</label>
+            <select>
+              <option>hf-text-classification-7wbw3q  (Succeeded · 2026-05-11)</option>
+              <option>resnet50-train-9k2pq  (Succeeded · 2026-05-10)</option>
+              <option>bert-finetune-x7m3  (Succeeded · 2026-05-09)</option>
+            </select>
+            <div class="hint">완료(Succeeded) 상태의 학습 워크로드만 표시</div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:16px">
+          <h4>2단계 · 산출물 정보 (자동 감지 · 수정 가능)</h4>
+          <div class="form-row">
+            <label>출력 경로 *</label>
+            <input value="pvc://mlteam-prj-pvc/output/hf-text-classification-7wbw3q/" readonly style="background:#f9fafb">
+            <div class="hint">Workload 가 사용한 PVC 의 <code>/output</code> 디렉토리 자동 감지</div>
+          </div>
+          <div class="form-row">
+            <label>산출 파일 *</label>
+            <select>
+              <option>model.onnx (482 MB)</option>
+              <option>model.engine (TensorRT, 380 MB)</option>
+              <option>model.pt (TorchScript, 510 MB)</option>
+              <option>saved_model/ (TensorFlow)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>형식 *</label>
+            <select>
+              <option>ONNX</option>
+              <option>TensorRT</option>
+              <option>TorchScript</option>
+              <option>PyTorch (.pt)</option>
+              <option>TensorFlow SavedModel</option>
+            </select>
+          </div>
+
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:14px 0">
+          <div style="font-size:12px;font-weight:600;color:#6b7280;margin-bottom:8px">▸ 입출력 스키마 (선택)</div>
+          <div class="grid-2">
+            <div>
+              <div class="form-row"><label>입력 텐서명</label><input value="input_ids" placeholder="예: input_ids"></div>
+              <div class="form-row"><label>입력 dtype</label>
+                <select><option>INT64</option><option>FP32</option><option>FP16</option></select>
+              </div>
+              <div class="form-row"><label>입력 shape</label><input value="[-1, 512]" placeholder="예: [-1, 512]"></div>
+            </div>
+            <div>
+              <div class="form-row"><label>출력 텐서명</label><input value="logits"></div>
+              <div class="form-row"><label>출력 dtype</label>
+                <select><option>FP32</option><option>FP16</option><option>INT64</option></select>
+              </div>
+              <div class="form-row"><label>출력 shape</label><input value="[-1, 2]"></div>
+            </div>
+          </div>
+
+          <div class="form-row" style="margin-top:14px">
+            <label>모델 별칭 *</label>
+            <input value="text-classifier-v1" placeholder="예: text-classifier-v1">
+            <div class="hint">Triton 의 model name 으로 사용됨. 소문자/숫자/하이픈/언더스코어</div>
+          </div>
+          <div class="form-row">
+            <label>Task</label>
+            <select><option>text-classification</option><option>image-classification</option><option>object-detection</option><option>embedding</option><option>기타</option></select>
+          </div>
+          <div class="form-row">
+            <label>설명 (선택)</label>
+            <textarea rows="2" placeholder="훈련 데이터, 정확도 등"></textarea>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-secondary" onclick="show('models')">취소</button>
+            <button class="btn btn-primary" onclick="show('models')">등록</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── (C) 수동 업로드 ── -->
+      <div id="src-manual" class="hidden">
+        <div class="panel" style="margin-top:16px">
+          <h4>1단계 · 스토리지 위치</h4>
+          <div class="form-row">
+            <label>저장소 유형 *</label>
+            <div class="radio-group">
+              <label><input type="radio" name="store" checked> PVC</label>
+              <label><input type="radio" name="store"> S3</label>
+              <label><input type="radio" name="store"> HTTP URL</label>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Cluster *</label>
+            <select><option>cluster01 (mlops)</option></select>
+          </div>
+          <div class="form-row">
+            <label>프로젝트 *</label>
+            <select><option>mlteam-prj</option></select>
+          </div>
+          <div class="form-row">
+            <label>PVC 이름 *</label>
+            <select><option>mlteam-prj-models-pvc</option><option>shared-storage-pvc</option></select>
+          </div>
+          <div class="form-row">
+            <label>경로 *</label>
+            <input value="/models/resnet50-v2/" placeholder="예: /models/resnet50-v2/">
+            <div class="hint">PVC 내부의 모델 파일이 위치한 디렉토리 또는 파일 경로</div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:16px">
+          <h4>2단계 · 모델 정보</h4>
+          <div class="form-row">
+            <label>형식 *</label>
+            <select>
+              <option>ONNX</option>
+              <option>TensorRT</option>
+              <option>TorchScript</option>
+              <option>PyTorch (.pt)</option>
+              <option>TensorFlow SavedModel</option>
+              <option>OpenVINO IR</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>모델 별칭 *</label>
+            <input placeholder="예: resnet50-v2">
+          </div>
+          <div class="form-row">
+            <label>Task</label>
+            <select><option>image-classification</option><option>object-detection</option><option>segmentation</option><option>기타</option></select>
+          </div>
+          <div class="form-row">
+            <label>설명 (선택)</label>
+            <textarea rows="2"></textarea>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-secondary" onclick="show('models')">취소</button>
+            <button class="btn btn-primary" onclick="show('models')">등록</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── ③ 모델 상세 (별도 페이지, 데이터-주도) ─── -->
+    <section id="view-model-detail" class="view hidden">
+      <div class="breadcrumb">GPU › Inference › Models › <span id="md-bc">-</span></div>
+      <div class="page-title" id="md-title">-</div>
+      <div class="page-subtitle" id="md-subtitle">-</div>
+
+      <div class="tab-row">
+        <div class="tab active">모델 정보</div>
+        <div class="tab">파일 목록</div>
+        <div class="tab">연관 리소스</div>
+      </div>
+
+      <!-- 탭 1: 모델 정보 -->
+      <div class="grid-2">
+        <div class="panel">
+          <h4>기본 정보 <span id="md-src-badge" style="margin-left:6px"></span></h4>
+          <div id="md-info"></div>
+        </div>
+        <div class="panel">
+          <h4>설명</h4>
+          <div id="md-desc" style="font-size:12.5px;line-height:1.7;color:#374151">-</div>
+          <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap" id="md-actions"></div>
+        </div>
+      </div>
+
+      <!-- 탭 2: 파일 목록 -->
+      <div class="panel" style="margin-top:16px">
+        <h4>파일 목록 <span id="md-files-source" style="font-weight:400;color:#6b7280;font-size:11.5px"></span></h4>
+        <table>
+          <thead><tr><th>파일명</th><th>크기</th><th>유형</th><th>SHA / 메타</th></tr></thead>
+          <tbody id="md-files"></tbody>
+        </table>
+      </div>
+
+      <!-- 탭 3: 연관 리소스 -->
+      <div class="panel" style="margin-top:16px">
+        <h4>연관 리소스 <span style="font-weight:400;color:#6b7280;font-size:11.5px">— 이 모델을 사용 중인 Deployment</span></h4>
+        <table>
+          <thead><tr><th>Deployment</th><th>Project</th><th>Framework</th><th>GPU</th><th>Status</th><th>생성일</th></tr></thead>
+          <tbody id="md-deploys"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // 사이드바 메뉴 → view 매핑
+  // (Inference 메뉴는 data-view 그대로, 그 외는 placeholder 표시)
+  function show(view) {
+    document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+    const target = document.getElementById('view-' + view);
+    if (target) {
+      target.classList.remove('hidden');
+    } else {
+      // placeholder view (Dashboard, Workload 등 — 본 mockup 범위 밖)
+      document.getElementById('view-placeholder').classList.remove('hidden');
+      const label = view.replace(/-/g, ' ');
+      document.getElementById('placeholder-name').textContent = label;
+      document.getElementById('placeholder-name-2').textContent = label;
+    }
+    // 상단 view-nav 활성화
+    document.querySelectorAll('.view-nav button').forEach(b => b.classList.remove('active'));
+    const btn = [...document.querySelectorAll('.view-nav button')].find(b => b.getAttribute('onclick')?.includes("'" + view + "'"));
+    if (btn) btn.classList.add('active');
+    // 사이드바 활성화
+    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+    const sb = document.querySelector(`.sidebar a[data-view="${view}"]`);
+    if (sb) sb.classList.add('active');
+    else if (['wizard1','wizard2','wizard3','detail','playground'].includes(view)) {
+      document.querySelector('.sidebar a[data-view="deployments"]').classList.add('active');
+    } else if (view === 'model-register' || view === 'model-detail') {
+      document.querySelector('.sidebar a[data-view="models"]').classList.add('active');
+    }
+    window.scrollTo(0,0);
+  }
+
+  // 사이드바 클릭 바인딩 (data-view 가진 모든 <a>)
+  // iOS Safari: <a> 가 href 없으면 탭 미인식 → 빈 onclick 속성 + href="#" 부여
+  document.querySelectorAll('.sidebar a[data-view]').forEach(a => {
+    a.setAttribute('href', '#');
+    a.setAttribute('onclick', '');  // iOS 탭 인식 트리거
+    a.style.cursor = 'pointer';
+  });
+  // 이벤트 위임으로 통일 (모바일 환경에서 더 안정적)
+  document.addEventListener('click', e => {
+    const link = e.target.closest('.sidebar a[data-view]');
+    if (link) {
+      e.preventDefault();
+      show(link.getAttribute('data-view'));
+    }
+  });
+
+  // Inference 그룹 접기/펼치기
+  function toggleInference() {
+    document.getElementById('inference-header').classList.toggle('collapsed');
+    document.getElementById('inference-children').classList.toggle('collapsed');
+  }
+
+  // ── 모바일 햄버거 사이드바 ──
+  function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('open');
+    document.querySelector('.sidebar-backdrop').classList.toggle('open');
+  }
+  // 사이드바 메뉴 항목 클릭 시 모바일에서는 자동으로 닫기
+  document.querySelectorAll('.sidebar a[data-view]').forEach(a => {
+    a.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        document.querySelector('.sidebar').classList.remove('open');
+        document.querySelector('.sidebar-backdrop').classList.remove('open');
+      }
+    });
+  });
+
+  // Tab 전환 (Deployment 상세 등)
+  document.querySelectorAll('.tab-row[data-tab-group]').forEach(row => {
+    row.querySelectorAll('.tab[data-tab]').forEach(tab => {
+      tab.style.cursor = 'pointer';
+      tab.addEventListener('click', () => {
+        const name = tab.getAttribute('data-tab');
+        const section = row.closest('section');
+        section.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        section.querySelectorAll('.tab-pane').forEach(p => {
+          p.classList.toggle('hidden', p.getAttribute('data-pane') !== name);
+        });
+      });
+    });
+  });
+
+  // 모델 등록 — 출처 토글
+  function setSrc(s) {
+    ['hf','trained','manual'].forEach(k => {
+      document.getElementById('src-' + k).classList.toggle('hidden', k !== s);
+    });
+  }
+
+  // ─── Model Registry 데이터 ───
+  const MODELS = {
+    'gpt-oss-120b': {
+      src: 'hf', srcLabel: '🤗 HuggingFace',
+      title: 'gpt-oss-120b',
+      subtitle: 'openai/gpt-oss-120b · text-generation · 120B params · 240GB',
+      info: [
+        ['모델명', 'openai/gpt-oss-120b'],
+        ['작성자', 'openai'],
+        ['Task', 'text-generation'],
+        ['라이브러리', 'transformers'],
+        ['파라미터', '120 B'],
+        ['파일 용량', '240 GB'],
+        ['텐서 타입', 'BF16'],
+        ['지원 언어', 'en, ko, ja, zh, ...'],
+        ['라이센스', 'Apache 2.0'],
+        ['Base 모델', '-'],
+        ['등록자', 'jhchoi · 2026-05-01'],
+      ],
+      desc: 'OpenAI 가 공개한 120B 파라미터 MoE 텍스트 생성 모델. 한국어 포함 다국어 지원. 추론 시 tensor-parallel 4 권장. vLLM 0.6+ 또는 SGLang 0.3+ 환경에서 검증됨.',
+      filesSource: '— HuggingFace repo',
+      files: [
+        ['config.json', '1.2 KB', 'config', 'a1b2c3d4'],
+        ['tokenizer.json', '9.4 MB', 'tokenizer', 'e5f6g7h8'],
+        ['model-00001-of-00050.safetensors', '4.8 GB', 'weights', 'f1e2d3c4'],
+        ['model-00002-of-00050.safetensors', '4.8 GB', 'weights', 'b5a6c7d8'],
+        ['<i style="color:#6b7280">... (총 53개 파일, 240 GB)</i>', '', '', ''],
+      ],
+      deploys: [
+        ['gpt120-prod', 'mlteam-prj', 'vLLM', '4×H100 × 2', 'run', 'Running', '2026-05-10'],
+        ['gpt120-staging', 'research-prj', 'vLLM', '4×H100 × 1', 'ready', 'Ready', '2026-05-08'],
+        ['gpt120-test', 'mlteam-prj', 'SGLang', '4×H100 × 1', 'pending', 'Pending', '2026-05-13'],
+      ],
+    },
+    'llama-3-8b': {
+      src: 'hf', srcLabel: '🤗 HuggingFace',
+      title: 'llama-3-8b',
+      subtitle: 'meta-llama/Llama-3-8B · text-generation · 8B params · 16GB',
+      info: [
+        ['모델명', 'meta-llama/Llama-3-8B'],
+        ['작성자', 'meta-llama'],
+        ['Task', 'text-generation'],
+        ['라이브러리', 'transformers'],
+        ['파라미터', '8.03 B'],
+        ['파일 용량', '16.07 GB'],
+        ['텐서 타입', 'BF16'],
+        ['지원 언어', 'en'],
+        ['라이센스', 'Llama 3 Community'],
+        ['Base 모델', '-'],
+        ['등록자', 'admin · 2026-04-22'],
+      ],
+      desc: 'Meta 가 공개한 8B 파라미터 LLM. 단일 H100/A100 1장으로 추론 가능. 영어 중심.',
+      filesSource: '— HuggingFace repo',
+      files: [
+        ['config.json', '0.7 KB', 'config', '11aa22bb'],
+        ['tokenizer.model', '1.8 MB', 'tokenizer', '33cc44dd'],
+        ['model-00001-of-00004.safetensors', '4.6 GB', 'weights', '55ee66ff'],
+        ['<i style="color:#6b7280">... (총 9개 파일, 16 GB)</i>', '', '', ''],
+      ],
+      deploys: [
+        ['llama-dev', 'mlteam-prj', 'SGLang', '1×H100 × 1', 'ready', 'Ready', '2026-05-08'],
+      ],
+    },
+    'bge-m3': {
+      src: 'hf', srcLabel: '🤗 HuggingFace',
+      title: 'bge-m3',
+      subtitle: 'BAAI/bge-m3 · embedding · 560M params · 2GB',
+      info: [
+        ['모델명', 'BAAI/bge-m3'],
+        ['작성자', 'BAAI'],
+        ['Task', 'embedding'],
+        ['라이브러리', 'sentence-transformers'],
+        ['파라미터', '560 M'],
+        ['파일 용량', '2.27 GB'],
+        ['텐서 타입', 'FP32'],
+        ['지원 언어', 'multilingual (100+)'],
+        ['라이센스', 'MIT'],
+        ['Base 모델', 'xlm-roberta-large'],
+        ['등록자', 'jhchoi · 2026-04-30'],
+      ],
+      desc: 'BAAI 의 다국어 임베딩 모델. dense / sparse / multi-vector 검색 지원. RAG 파이프라인에 적합.',
+      filesSource: '— HuggingFace repo',
+      files: [
+        ['config.json', '0.5 KB', 'config', 'aa11bb22'],
+        ['tokenizer.json', '17 MB', 'tokenizer', 'cc33dd44'],
+        ['pytorch_model.bin', '2.27 GB', 'weights', 'ee55ff66'],
+      ],
+      deploys: [],
+    },
+    'text-classifier-v1': {
+      src: 'trained', srcLabel: '🎯 학습 산출물',
+      title: 'text-classifier-v1',
+      subtitle: 'ONNX · text-classification · 110M params · 482MB',
+      info: [
+        ['모델명', 'text-classifier-v1'],
+        ['형식', 'ONNX (opset 17)'],
+        ['Task', 'text-classification'],
+        ['파라미터', '110 M'],
+        ['파일 용량', '482 MB'],
+        ['원본 Workload', 'hf-text-classification-7wbw3q'],
+        ['프로젝트', 'mlteam-prj'],
+        ['Cluster', 'cluster01'],
+        ['출력 경로', 'pvc://mlteam-prj-pvc/output/hf-text-classification-7wbw3q/'],
+        ['입력 스키마', 'input_ids INT64 [-1, 512]'],
+        ['출력 스키마', 'logits FP32 [-1, 2]'],
+        ['Validation accuracy', '94.2 %'],
+        ['등록자', 'jhchoi · 2026-05-12'],
+      ],
+      desc: '사내 텍스트 분류 학습 워크로드에서 추출한 ONNX 모델. Triton ONNX backend 로 서빙 권장. positive/negative 2-class.',
+      filesSource: '— Workload 출력 디렉토리 (PVC)',
+      files: [
+        ['model.onnx', '482 MB', 'weights', 'opset=17'],
+        ['tokenizer.json', '4.2 MB', 'tokenizer', '-'],
+        ['config.json', '0.6 KB', 'config', '-'],
+        ['training_metrics.json', '12 KB', 'metadata', 'acc=94.2%'],
+      ],
+      deploys: [
+        ['textclass-prod', 'mlteam-prj', 'Triton', '1×T4 × 2', 'run', 'Running', '2026-05-13'],
+      ],
+    },
+    'resnet50-finetune': {
+      src: 'trained', srcLabel: '🎯 학습 산출물',
+      title: 'resnet50-finetune',
+      subtitle: 'TensorRT · image-classification · 25M params · 380MB',
+      info: [
+        ['모델명', 'resnet50-finetune'],
+        ['형식', 'TensorRT engine (FP16)'],
+        ['Task', 'image-classification'],
+        ['파라미터', '25 M'],
+        ['파일 용량', '380 MB'],
+        ['원본 Workload', 'resnet50-train-9k2pq'],
+        ['프로젝트', 'research-prj'],
+        ['Cluster', 'cluster01'],
+        ['출력 경로', 'pvc://research-prj-pvc/output/resnet50-train-9k2pq/'],
+        ['입력 스키마', 'input FP16 [-1, 3, 224, 224]'],
+        ['출력 스키마', 'output FP32 [-1, 1000]'],
+        ['TensorRT version', '10.0'],
+        ['등록자', 'research-team · 2026-05-11'],
+      ],
+      desc: 'ImageNet pretrained 위에 사내 데이터셋으로 fine-tune. TensorRT FP16 변환 후 추론 latency 4.2ms (T4 batch=8).',
+      filesSource: '— Workload 출력 디렉토리 (PVC)',
+      files: [
+        ['model.engine', '380 MB', 'TRT engine', 'TRT=10.0, fp16'],
+        ['model.onnx', '102 MB', 'pre-conversion', '-'],
+        ['calibration.cache', '256 KB', 'INT8 cal.', '-'],
+        ['labels.txt', '21 KB', 'labels', '1000 classes'],
+      ],
+      deploys: [],
+    },
+    'yolo-v8': {
+      src: 'manual', srcLabel: '📁 수동 업로드',
+      title: 'yolo-v8',
+      subtitle: 'ONNX · object-detection · 43M params · 132MB',
+      info: [
+        ['모델명', 'yolo-v8'],
+        ['형식', 'ONNX (opset 17)'],
+        ['Task', 'object-detection'],
+        ['파라미터', '43 M'],
+        ['파일 용량', '132 MB'],
+        ['저장소', 'PVC'],
+        ['프로젝트', 'mlteam-prj'],
+        ['Cluster', 'cluster01'],
+        ['경로', 'pvc://mlteam-prj-models-pvc/yolo-v8/'],
+        ['입력 스키마', 'images FP32 [-1, 3, 640, 640]'],
+        ['출력 스키마', 'output FP32 [-1, 84, 8400]'],
+        ['등록자', 'admin · 2026-05-05'],
+      ],
+      desc: 'Ultralytics YOLOv8 medium 모델을 ONNX 로 변환한 객체 검출 모델. COCO 80-class 사전학습 가중치 그대로.',
+      filesSource: '— PVC 디렉토리',
+      files: [
+        ['yolov8m.onnx', '132 MB', 'weights', 'opset=17'],
+        ['coco_labels.txt', '0.6 KB', 'labels', '80 classes'],
+      ],
+      deploys: [
+        ['yolo-prod', 'mlteam-prj', 'Triton', '1×T4 × 1', 'run', 'Running', '2026-05-06'],
+        ['yolo-batch', 'mlteam-prj', 'Triton', '1×T4 × 1', 'ready', 'Ready', '2026-05-09'],
+      ],
+    },
+  };
+
+  function showModelDetail(id) {
+    const m = MODELS[id];
+    if (!m) { show('model-detail'); return; }
+    document.getElementById('md-bc').textContent = m.title;
+    document.getElementById('md-title').textContent = m.title;
+    document.getElementById('md-subtitle').textContent = m.subtitle;
+    document.getElementById('md-src-badge').innerHTML =
+      `<span class="src-badge ${m.src}">${m.srcLabel}</span>`;
+    document.getElementById('md-info').innerHTML = m.info
+      .map(([l, v]) => `<div class="meta-row"><span class="label">${l}</span><span class="value">${v}</span></div>`)
+      .join('');
+    document.getElementById('md-desc').textContent = m.desc;
+    // Actions per source
+    const actions = [`<button class="btn btn-primary" onclick="show('wizard1')">이 모델로 배포 신청 →</button>`];
+    if (m.src === 'hf')       actions.push(`<button class="btn btn-secondary">HuggingFace 페이지 ↗</button>`);
+    if (m.src === 'trained')  actions.push(`<button class="btn btn-secondary">원본 Workload 보기 ↗</button>`);
+    if (m.src === 'manual')   actions.push(`<button class="btn btn-secondary">PVC 브라우저 ↗</button>`);
+    document.getElementById('md-actions').innerHTML = actions.join('');
+    // Files
+    document.getElementById('md-files-source').textContent = m.filesSource;
+    document.getElementById('md-files').innerHTML = m.files
+      .map(([n, sz, ty, sha]) => `<tr><td>${n}</td><td>${sz}</td><td>${ty}</td><td><code style="font-size:10.5px">${sha}</code></td></tr>`)
+      .join('');
+    // Deployments
+    if (m.deploys.length === 0) {
+      document.getElementById('md-deploys').innerHTML =
+        `<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:20px">현재 이 모델을 사용 중인 Deployment 가 없습니다</td></tr>`;
+    } else {
+      document.getElementById('md-deploys').innerHTML = m.deploys
+        .map(([n, p, fw, gpu, st, stL, dt]) =>
+          `<tr style="cursor:pointer" onclick="show('detail')"><td><b>${n}</b></td><td>${p}</td><td>${fw}</td><td>${gpu}</td><td><span class="status ${st}"><span class="dot ${st === 'run' ? 'green' : st === 'ready' ? 'blue' : 'yellow'}"></span>${stL}</span></td><td>${dt}</td></tr>`)
+        .join('');
+    }
+    show('model-detail');
+  }
+
+  // 신청 Step 2 — Framework 토글
+  function setFw(f) {
+    ['vllm','sglang','triton','torchserve','custom'].forEach(k => {
+      const el = document.getElementById('fw-' + k);
+      if (el) el.classList.toggle('hidden', k !== f);
+    });
+    // Framework 카드 active 상태 갱신
+    document.querySelectorAll('.fw-card').forEach(card => {
+      const input = card.querySelector('input');
+      card.classList.toggle('active', input && input.checked);
+    });
+  }
+  // 카드 클릭 시 라디오 toggle + setFw 호출
+  document.querySelectorAll('.fw-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const input = card.querySelector('input');
+      if (input) {
+        input.checked = true;
+        const map = ['vllm','sglang','triton','torchserve','custom'];
+        const idx = [...card.parentNode.children].indexOf(card);
+        setFw(map[idx]);
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
