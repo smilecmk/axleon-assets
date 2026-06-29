@@ -1,4 +1,4 @@
-# ds-mlops-assets
+# axleon-assets
 
 `ds-mlops` 디자인 시스템의 **무거운 참고 미디어·발표자료** 보관용 별도 레포.
 코드 레포(`ds-mlops`)를 가볍게 유지하고 Vercel Storybook 빌드 부담을 줄이기 위해 분리한다.
